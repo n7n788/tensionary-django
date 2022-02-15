@@ -1,4 +1,9 @@
 # tensionary-django
+## アクセス
+```
+ローカルホストアドレス/diary
+```
+
 ## ブランチ
 * master
   * 触らない
@@ -13,3 +18,8 @@
 {Issue番号}-{Issueの内容}
 ex. 1-create-form
 ```
+
+## フォーマット
+* インデント幅
+  * python -> スペース4
+  * HTML, JavaScript -> スペース2
