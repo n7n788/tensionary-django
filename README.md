@@ -25,5 +25,9 @@ ex. 1-create-form
   * python -> スペース4
   * HTML, JavaScript -> スペース2
 
+## 参考
+*  [Python命名規則一覧](https://qiita.com/naomi7325/items/4eb1d2a40277361e898b)
+*  [VScodeのインデント幅を言語毎に指定する](https://qiita.com/kenkono/items/85fd0f15bcec0ac64605)
+
 ## 素材
 * 利用した素材などがあればここに書く
