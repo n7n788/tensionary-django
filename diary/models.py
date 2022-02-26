@@ -11,7 +11,7 @@ class User(models.Model):
 class Diary(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     tension = models.IntegerField()
-    detail = models.CharField(max_length=200)
+    detail = models.CharField(max_length=500)
     date = models.DateField()
     def __str__(self):
         return str(self.user.email) + '(' + str(self.date) + ')'
