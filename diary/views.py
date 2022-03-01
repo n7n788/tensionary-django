@@ -16,6 +16,7 @@ figsize_y = 4
 トップページ
   * 日記の新規作成
 '''
+# TODO: x軸のデータはDBから取得
 def index(request):
     x = list(range(-5,5))
     y = list(range(len(x)))
@@ -27,7 +28,9 @@ def index(request):
     }
     return render(request, 'diary/index.html', params)
 
-
+# TODO:
+# x軸のメモリを日付にする
+# 余裕あればデザイン綺麗にする（色とか選べるようにする？）
 def create_graph(x, y):
     plt.cla()
     plt.figure(figsize=(figsize_x,figsize_y))
@@ -36,7 +39,6 @@ def create_graph(x, y):
     ax.plot(x,y, 'k-', lw=1.5, alpha=0.6, color='red',label='')
     ax.plot(x, y, 'o', color='red', markersize=5, markeredgewidth=3,
         markeredgecolor='red', alpha=0.8, label='')
-
 
 
 def get_image():
@@ -48,6 +50,11 @@ def get_image():
     buffer.close()
     return graph
 
+
+# TODO:
+# 日記データを取得してreturnで返す
+def get_diary():
+    pass
 
 '''
 日記新規作成
