@@ -74,7 +74,7 @@ def login(request):
         return redirect(to='/diary')
     params = {
         'title': 'Register User',
-        'form': RegisterUserForm(),
+        'form': LoginUserForm(),
     }
     return render(request, 'diary/login.html', params)
 
