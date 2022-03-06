@@ -92,7 +92,7 @@ def login(request):
 
   * 登録完了したらログイン画面にリダイレクト
 '''
-# @login_required
+
 def register_user(request):
     
     #入力した2つのパスワード異なる場合、エラーメッセージをparams.errorに設定する
