@@ -6,7 +6,7 @@ from django.contrib.auth.models import AbstractUser
 class User(AbstractUser):
     username = models.CharField(max_length=100)#今回は利用しない
     email = models.EmailField(max_length=100, unique=True)
-    passward = models.CharField(max_length=100)
+    password = models.CharField(max_length=100)
     
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'email'#ログイン時に要求されるユーザー名をメアドに変更
