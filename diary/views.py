@@ -4,6 +4,7 @@ from diary.forms import DiaryForm, LoginUserForm, RegisterUserForm, SettingEmail
 
 #ログインに必要な関数
 from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
 from .models import User
 
 # Create your views here.
@@ -11,6 +12,7 @@ from .models import User
 トップページ
   * 日記の新規作成
 '''
+@login_required(login_url = '/diary/login')
 def index(request):
     params = {
         'title': 'Tensionary',
@@ -20,6 +22,7 @@ def index(request):
 '''
 日記新規作成
 '''
+@login_required(login_url = '/diary/login')
 def create_diary(request):
     params = {
         'title': 'Create Diary',
@@ -34,6 +37,7 @@ def create_diary(request):
 '''
 日記編集
 '''
+@login_required(login_url = '/diary/login')
 def edit_diary(request, num):
     params = {
         'title': 'Edit Diary',
@@ -47,12 +51,14 @@ def edit_diary(request, num):
 '''
 設定画面
 '''
+@login_required(login_url = '/diary/login')
 def setting(request):
     params = {
         'title': 'Setting',
     }
     return render(request, 'diary/setting.html', params)
 
+@login_required(login_url = '/diary/login')
 def setting_email(request):
     params = {
         'title': 'Setting Password',
@@ -60,6 +66,7 @@ def setting_email(request):
     }
     return render(request, 'diary/setting_email.html', params)
 
+@login_required(login_url = '/diary/login')
 def setting_password(request):
     params = {
         'title': 'Setting Password',
@@ -72,7 +79,7 @@ def setting_password(request):
   * DBと照合
   * OKならトップページへ遷移
 '''
-#この関数の内部でDjango標準のlogin関数を利用するため、名前の被りを避けるため関数名を変更した
+#この関数の内部でDjango標準のlogin関数を利用するため、関数名を変更した
 def login_user(request):
     
     error_message = '' 
