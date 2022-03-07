@@ -24,7 +24,7 @@ def create_diary(request):
     
     params = {
         'title': 'Create Diary',
-        'form': DiaryForm,
+        'form': DiaryForm(),
     }
     
     if (request.method == 'POST'):
