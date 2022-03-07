@@ -2,6 +2,9 @@ from django.shortcuts import redirect, render
 
 from diary.forms import DiaryForm, LoginUserForm, RegisterUserForm, SettingEmailForm, SettingPasswordForm
 
+from django.contrib.auth import login
+
+from .models import Diary, User
 # Create your views here.
 '''
 トップページ
@@ -16,15 +19,29 @@ def index(request):
 '''
 日記新規作成
 '''
+
 def create_diary(request):
+    
     params = {
         'title': 'Create Diary',
-        'form': DiaryForm(),
+        'form': DiaryForm,
     }
+    
     if (request.method == 'POST'):
         # ここで入力内容の照合
-        print("Tension: " + request.POST['tension'] + '\n' + "Detail: " + request.POST['detail'])
-        return redirect(to='/diary')
+        obj = Diary()
+        form = DiaryForm(request.POST, instance=obj)
+        params['form'] = form
+        #フォームのバリデーションチェック
+        if form.is_valid():
+            #日記を保存
+            user = request.user
+            tension = request.POST['tension']
+            detail = request.POST['detail']
+            diary = Diary(user=user, tension=tension, detail=detail)
+            diary.save()
+            return redirect(to='/diary')
+            
     return render(request, 'diary/create_diary.html', params)
 
 '''
