@@ -1,6 +1,6 @@
 from turtle import color
 from django.shortcuts import redirect, render
-
+from .models import User
 from diary.forms import DiaryForm, LoginUserForm, RegisterUserForm, SettingEmailForm, SettingPasswordForm
 import matplotlib
 matplotlib.use('Agg')
@@ -88,6 +88,7 @@ def edit_diary(request, num):
 '''
 設定画面
 '''
+
 def setting(request):
     params = {
         'title': 'Setting',
@@ -139,13 +140,29 @@ def login(request):
 
   * 登録完了したらログイン画面にリダイレクト
 '''
-def register_user(request):
-    if (request.method == 'POST'):
-        # ここで登録内容チェック
-        return redirect(to='/diary/login')
 
+def register_user(request):
+    #入力した2つのパスワード異なる場合、エラーメッセージをparams.errorに設定する
     params = {
         'title': 'Register User',
         'form': RegisterUserForm(),
+        'error_message': '',
     }
+
+    if (request.method == 'POST'):
+        email = request.POST['email']
+        password = request.POST['password']
+        password_again = request.POST['password_again']
+
+        #入力した2つのパスワードが異なる場合
+        if(password != password_again):
+            params['form'] = RegisterUserForm(request.POST)
+            params['error_message'] = '同一のパスワードを入力してください'
+            return render(request, 'diary/register_user.html', params)
+
+        #ユーザーをDBに登録
+        user = User(email=email, password=password)
+        user.save()
+        return redirect(to='/diary/login')
+    
     return render(request, 'diary/register_user.html', params)
