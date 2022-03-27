@@ -64,10 +64,14 @@ def get_diary():
 '''
 日記新規作成
 '''
+'''
+日記新規作成
+'''
 def create_diary(request):
     params = {
         'title': 'Create Diary',
         'form': DiaryForm(),
+        'error_message': "",
     }
     if (request.method == 'POST'):
         # ここで入力内容の照合
@@ -82,7 +86,9 @@ def create_diary(request):
             detail = request.POST['detail']
             diary = Diary(user=user, tension=tension, detail=detail)
             diary.save()
-        return redirect(to='/diary')
+            return redirect(to='/diary')
+        else:
+            params['error_message'] = "コメントは500文字以内にしてください"
     return render(request, 'diary/create_diary.html', params)
 
 
