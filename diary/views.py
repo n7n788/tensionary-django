@@ -10,7 +10,7 @@ import numpy as np
 
 #ログインに必要な関数をインポート
 from django.contrib.auth import login
-from .models import User
+from .models import User, Diary
 
 figsize_x = 12
 figsize_y = 4
@@ -71,7 +71,17 @@ def create_diary(request):
     }
     if (request.method == 'POST'):
         # ここで入力内容の照合
-        print("Tension: " + request.POST['tension'] + '\n' + "Detail: " + request.POST['detail'])
+        obj = Diary()
+        form = DiaryForm(request.POST, instance=obj)
+        params['form'] = form
+        #フォームのバリデーションチェック
+        if form.is_valid():
+            #日記を保存
+            user = request.user
+            tension = request.POST['tension']
+            detail = request.POST['detail']
+            diary = Diary(user=user, tension=tension, detail=detail)
+            diary.save()
         return redirect(to='/diary')
     return render(request, 'diary/create_diary.html', params)
 
