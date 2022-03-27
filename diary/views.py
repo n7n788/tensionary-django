@@ -8,6 +8,10 @@ import matplotlib.pyplot as plt
 import base64, io
 import numpy as np
 
+#ログインに必要な関数をインポート
+from django.contrib.auth import login
+from .models import User
+
 figsize_x = 12
 figsize_y = 4
 
@@ -25,6 +29,7 @@ def index(request):
     params = {
         'title': 'Tensionary',
         'tension_graph': tension_graph,
+        'user': request.user,
     }
     return render(request, 'diary/index.html', params)
 
@@ -117,13 +122,32 @@ def setting_password(request):
   * DBと照合
   * OKならトップページへ遷移
 '''
-def login(request):
+#この関数の内部でDjango標準のlogin関数を利用するため、名前の被りを避けるため関数名を変更した
+def login_user(request):
+
+    error_message = '' 
+    form = RegisterUserForm()
+
     if (request.method == 'POST'):
         # ここで入力内容の照合
-        return redirect(to='/diary')
+        email = request.POST['email']
+        password = request.POST['password']
+
+        #メールアドレスが一致するユーザーを検索
+        user = User.objects.get(email=email)
+        #そのユーザーが存在し、パスワードが一致していたらログイン
+        if user is not None and user.password == password:
+            login(request, user)
+            return redirect(to='/diary')
+        else:
+            #認証失敗したので、エラーメッセージを設定
+            error_message = 'メールアドレスまたはパスワードが間違っています'
+            form = RegisterUserForm(request.POST)
+
     params = {
         'title': 'Register User',
-        'form': LoginUserForm(),
+        'form': form,
+        'error_message': error_message,
     }
     return render(request, 'diary/login.html', params)
 
