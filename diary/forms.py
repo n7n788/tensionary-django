@@ -13,7 +13,7 @@ class RegisterUserForm(forms.Form):
 
 class DiaryForm(forms.ModelForm):
     tension = forms.IntegerField(
-        label='今日の気分', max_value=5, min_value=0,
+        label='今日の気分', max_value=100, min_value=0,
         required=False,
         widget=forms.TextInput(attrs={
             'type': 'range',
