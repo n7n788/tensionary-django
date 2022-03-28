@@ -69,9 +69,6 @@ def get_diary():
 '''
 日記新規作成
 '''
-'''
-日記新規作成
-'''
 def create_diary(request):
     params = {
         'title': 'Create Diary',
