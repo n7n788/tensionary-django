@@ -23,6 +23,6 @@ class Diary(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     tension = models.IntegerField()
     detail = models.CharField(max_length=500)
-    date = models.DateField(auto_now_add=True)
+    date = models.DateField(auto_now_add=True)#日付は日記作成時に自動で設定されるように変更
     def __str__(self):
         return str(self.user.email) + '(' + str(self.date) + ')'
