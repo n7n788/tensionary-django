@@ -1,6 +1,19 @@
+from turtle import color
 from django.shortcuts import redirect, render
-
+from .models import User
 from diary.forms import DiaryForm, LoginUserForm, RegisterUserForm, SettingEmailForm, SettingPasswordForm
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import base64, io
+import numpy as np
+
+#ログインに必要な関数をインポート
+from django.contrib.auth import login
+from .models import User
+
+figsize_x = 12
+figsize_y = 4
 
 #ログインに必要な関数
 from django.contrib.auth import login
@@ -12,17 +25,50 @@ from .models import User
 トップページ
   * 日記の新規作成
 '''
-@login_required(login_url = '/diary/login')
+# TODO: x軸のデータはDBから取得
 def index(request):
+    x = list(range(-5,5))
+    y = list(range(len(x)))
+    create_graph(x, y)
+    tension_graph = get_image()
     params = {
         'title': 'Tensionary',
+        'tension_graph': tension_graph,
+        'user': request.user,
     }
     return render(request, 'diary/index.html', params)
+
+# TODO:
+# x軸のメモリを日付にする
+# 余裕あればデザイン綺麗にする（色とか選べるようにする？）
+def create_graph(x, y):
+    plt.cla()
+    plt.figure(figsize=(figsize_x,figsize_y))
+    ax = plt.gca()
+    ax.axes.yaxis.set_visible(False)
+    ax.plot(x,y, 'k-', lw=1.5, alpha=0.6, color='red',label='')
+    ax.plot(x, y, 'o', color='red', markersize=5, markeredgewidth=3,
+        markeredgecolor='red', alpha=0.8, label='')
+
+
+def get_image():
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    image_png = buffer.getvalue()
+    graph = base64.b64encode(image_png)
+    graph = graph.decode('utf-8')
+    buffer.close()
+    return graph
+
+
+# TODO:
+# 日記データを取得してreturnで返す
+def get_diary():
+    pass
 
 '''
 日記新規作成
 '''
-@login_required(login_url = '/diary/login')
 def create_diary(request):
     params = {
         'title': 'Create Diary',
@@ -34,10 +80,10 @@ def create_diary(request):
         return redirect(to='/diary')
     return render(request, 'diary/create_diary.html', params)
 
+
 '''
 日記編集
 '''
-@login_required(login_url = '/diary/login')
 def edit_diary(request, num):
     params = {
         'title': 'Edit Diary',
@@ -48,17 +94,16 @@ def edit_diary(request, num):
         return redirect(to='/diary')
     return render(request, 'diary/edit_diary.html', params)
 
+
 '''
 設定画面
 '''
-@login_required(login_url = '/diary/login')
 def setting(request):
     params = {
         'title': 'Setting',
     }
     return render(request, 'diary/setting.html', params)
 
-@login_required(login_url = '/diary/login')
 def setting_email(request):
     params = {
         'title': 'Setting Password',
@@ -66,7 +111,6 @@ def setting_email(request):
     }
     return render(request, 'diary/setting_email.html', params)
 
-@login_required(login_url = '/diary/login')
 def setting_password(request):
     params = {
         'title': 'Setting Password',
@@ -74,27 +118,29 @@ def setting_password(request):
     }
     return render(request, 'diary/setting_password.html', params)
 
+
 '''
 ログイン
   * DBと照合
   * OKならトップページへ遷移
 '''
-#この関数の内部でDjango標準のlogin関数を利用するため、関数名を変更した
+#この関数の内部でDjango標準のlogin関数を利用するため、名前の被りを避けるため関数名を変更した
 def login_user(request):
-    
+
     error_message = '' 
     form = RegisterUserForm()
-    
+
+
     if (request.method == 'POST'):
         # ここで入力内容の照合
         email = request.POST['email']
         password = request.POST['password']
-        
+
         #メールアドレスが一致するユーザーを検索
-        user = User.objects.get(email=email)
+        user = User.objects.filter(email=email)
         #そのユーザーが存在し、パスワードが一致していたらログイン
-        if user is not None and user.password == password:
-            login(request, user)
+        if len(user) == 1 and user[0].password == password:
+            login(request, user[0])
             return redirect(to='/diary')
         else:
             #認証失敗したので、エラーメッセージを設定
@@ -108,6 +154,7 @@ def login_user(request):
     }
     return render(request, 'diary/login.html', params)
 
+
 '''
 新規登録
   * POST送信されたユーザー名, パスワードを取得しDB登録
@@ -120,13 +167,29 @@ def login_user(request):
         
   * 登録完了したらログイン画面にリダイレクト
 '''
-def register_user(request):
-    if (request.method == 'POST'):
-        # ここで登録内容チェック
-        return redirect(to='/diary/login')
 
+def register_user(request):
+    #入力した2つのパスワード異なる場合、エラーメッセージをparams.errorに設定する
     params = {
         'title': 'Register User',
         'form': RegisterUserForm(),
+        'error_message': '',
     }
+
+    if (request.method == 'POST'):
+        email = request.POST['email']
+        password = request.POST['password']
+        password_again = request.POST['password_again']
+
+        #入力した2つのパスワードが異なる場合
+        if(password != password_again):
+            params['form'] = RegisterUserForm(request.POST)
+            params['error_message'] = '同一のパスワードを入力してください'
+            return render(request, 'diary/register_user.html', params)
+
+        #ユーザーをDBに登録
+        user = User(email=email, password=password)
+        user.save()
+        return redirect(to='/diary/login')
+    
     return render(request, 'diary/register_user.html', params)
