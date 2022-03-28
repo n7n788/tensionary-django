@@ -134,10 +134,10 @@ def login_user(request):
         password = request.POST['password']
 
         #メールアドレスが一致するユーザーを検索
-        user = User.objects.get(email=email)
+        user = User.objects.filter(email=email)
         #そのユーザーが存在し、パスワードが一致していたらログイン
-        if user is not None and user.password == password:
-            login(request, user)
+        if len(user) == 1 and user[0].password == password:
+            login(request, user[0])
             return redirect(to='/diary')
         else:
             #認証失敗したので、エラーメッセージを設定
