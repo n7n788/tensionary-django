@@ -47,8 +47,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'diary.middleware.auth.AuthMiddleware',
-    'global_login_required.GlobalLoginRequiredMiddleware',
+    'diary.middleware.auth.LoginRequiredMiddleware',
 ]
 
 ROOT_URLCONF = 'tensionary.urls'
@@ -125,9 +124,3 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'diary.User'
-
-#ログインなしで実行可能なurl
-PUBLIC_PATHS = [
-	'/diary/login',
-    '/diary/register_user'
-]

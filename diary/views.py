@@ -15,6 +15,11 @@ from .models import User, Diary
 figsize_x = 12
 figsize_y = 4
 
+#ログインに必要な関数
+from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
+from .models import User
+
 # Create your views here.
 '''
 トップページ
@@ -109,13 +114,11 @@ def edit_diary(request, num):
 '''
 設定画面
 '''
-
 def setting(request):
     params = {
         'title': 'Setting',
     }
     return render(request, 'diary/setting.html', params)
-
 
 def setting_email(request):
     params = {
@@ -123,7 +126,6 @@ def setting_email(request):
         'form': SettingEmailForm(),
     }
     return render(request, 'diary/setting_email.html', params)
-
 
 def setting_password(request):
     params = {
@@ -144,22 +146,23 @@ def login_user(request):
     error_message = '' 
     form = RegisterUserForm()
 
+
     if (request.method == 'POST'):
         # ここで入力内容の照合
         email = request.POST['email']
         password = request.POST['password']
 
         #メールアドレスが一致するユーザーを検索
-        user = User.objects.get(email=email)
+        user = User.objects.filter(email=email)
         #そのユーザーが存在し、パスワードが一致していたらログイン
-        if user is not None and user.password == password:
-            login(request, user)
+        if len(user) == 1 and user[0].password == password:
+            login(request, user[0])
             return redirect(to='/diary')
         else:
             #認証失敗したので、エラーメッセージを設定
             error_message = 'メールアドレスまたはパスワードが間違っています'
             form = RegisterUserForm(request.POST)
-
+            
     params = {
         'title': 'Register User',
         'form': form,
@@ -172,12 +175,12 @@ def login_user(request):
 新規登録
   * POST送信されたユーザー名, パスワードを取得しDB登録
   * 今日の日付, ログインユーザーをDB登録
-
+  
   * emailがDBに登録済みかどうか確認
   * パスワードとパスワード(確認)が一致するか確認
         -> OKならDB登録
         -> NGならエラーメッセージだして再入力
-
+        
   * 登録完了したらログイン画面にリダイレクト
 '''
 
