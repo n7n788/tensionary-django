@@ -10,7 +10,7 @@ import numpy as np
 
 #ログインに必要な関数をインポート
 from django.contrib.auth import login
-from .models import User
+from .models import User, Diary
 
 figsize_x = 12
 figsize_y = 4
@@ -89,7 +89,26 @@ def edit_diary(request, num):
         return redirect(to='/diary')
     return render(request, 'diary/edit_diary.html', params)
 
-
+'''
+日記削除
+'''
+def delete_diary(request, num):
+    diary =  Diary.objects.get(id=num)
+    #取得した日記のユーザーが、アクセスしているユーザーでなければリダイレクト
+    if diary.user != request.user:
+        return redirect(to='/diary')
+        
+    if request.method == 'POST':
+        diary.delete()
+        return redirect(to='/diary')
+    
+    params = {
+        'title': 'Delete Diary',
+        'id': num,
+        'diary': diary,
+    }
+    return render(request, 'diary/delete_diary.html', params)
+    
 '''
 設定画面
 '''
