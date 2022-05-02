@@ -3,6 +3,11 @@ from django.shortcuts import redirect, render
 
 from diary.forms import DiaryForm, LoginUserForm, RegisterUserForm, SettingEmailForm, SettingPasswordForm
 from .models import User
+
+#ユーザー作成のために必要な機能
+import uuid;
+from django.db import IntegrityError
+
 # Create your views here.
 '''
 トップページ
@@ -103,19 +108,27 @@ def register_user(request):
     }
     
     if (request.method == 'POST'):
-        email = request.POST['email']
-        password = request.POST['password']
-        password_again = request.POST['password_again']
-        
-        #入力した2つのパスワードが異なる場合
-        if(password != password_again):
-            params['form'] = RegisterUserForm(request.POST)
-            params['error_message'] = '同一のパスワードを入力してください'
-            return render(request, 'diary/register_user.html', params)
-        
-        #ユーザーをDBに登録
-        user = User(email=email, password=password)
-        user.save()
-        return redirect(to='/diary/login')
+        form = RegisterUserForm(request.POST)
+        params['form'] = form
+        if form.is_valid:
+            #メールアドレスとパスワードを読み取る
+            email = request.POST['email']
+            password = request.POST['password']
+            password_again = request.POST['password_again']
+            
+            #2つのパスワードが一致していたらユーザー登録する
+            if password == password_again:
+                uuid_object = uuid.uuid1()
+                username = uuid_object.hex
+                try:
+                    user = User.objects.create_user(username=username, email=email, password=password)
+                    return redirect(to='/diary/login')
+                except IntegrityError:
+                    params['error_message'] = '既に登録済みです'
+            #2つのパスワードが一致していなかった場合        
+            else: params['error_message'] = 'パスワードは同一の値を入力してください'
+            
+        #不適切な値が入力されていた場合
+        else: params['error_message'] = '適切な値を入力してください'
     
     return render(request, 'diary/register_user.html', params)
