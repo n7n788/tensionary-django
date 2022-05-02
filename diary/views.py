@@ -11,6 +11,7 @@ import numpy as np
 #ログインに必要な関数をインポート
 from django.contrib.auth import login
 from .models import User
+from .backends import EmailAuthBackend
 
 figsize_x = 12
 figsize_y = 4
@@ -126,34 +127,34 @@ def setting_password(request):
 '''
 #この関数の内部でDjango標準のlogin関数を利用するため、名前の被りを避けるため関数名を変更した
 def login_user(request):
-
-    error_message = '' 
-    form = RegisterUserForm()
-
-
-    if (request.method == 'POST'):
-        # ここで入力内容の照合
-        email = request.POST['email']
-        password = request.POST['password']
-
-        #メールアドレスが一致するユーザーを検索
-        user = User.objects.filter(email=email)
-        #そのユーザーが存在し、パスワードが一致していたらログイン
-        if len(user) == 1 and user[0].password == password:
-            login(request, user[0])
-            return redirect(to='/diary')
-        else:
-            #認証失敗したので、エラーメッセージを設定
-            error_message = 'メールアドレスまたはパスワードが間違っています'
-            form = RegisterUserForm(request.POST)
-            
     params = {
-        'title': 'Register User',
-        'form': form,
-        'error_message': error_message,
+        'title': 'Login User',
+        'user': '-', 
+        'form': LoginUserForm(),
+        'error_message': '',
     }
+    if (request.method == 'POST'):
+        form = LoginUserForm(request.POST)
+        params['form'] = form
+        
+        if form.is_valid:   
+            # メールアドレスとパスワードを読み取る
+            email = request.POST['email']
+            password = request.POST['password']
+            #メールアドレスでユーザー認証を行う
+            auth_object = EmailAuthBackend()
+            user = auth_object.authenticate(email=email, password=password, request=request)
+            if user is not None:
+                login(request, user, backend = 'diary.backends.EmailAuthBackend')
+                params['user'] = request.user
+                return render(request, 'diary/index.html', params)
+            else:
+                params['error_message'] = "メールアドレスまたはパスワードが間違っています"
+                
+        else:
+            params['error_message'] = "入力した値が適切ではありません"
+            
     return render(request, 'diary/login.html', params)
-
 
 '''
 新規登録
