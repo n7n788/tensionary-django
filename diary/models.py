@@ -23,6 +23,6 @@ class Diary(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     tension = models.IntegerField()
     detail = models.CharField(max_length=500)
-    date = models.DateField()
+    date = models.DateField(auto_now_add=True)
     def __str__(self):
         return str(self.user.email) + '(' + str(self.date) + ')'
