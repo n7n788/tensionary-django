@@ -97,10 +97,20 @@ def setting(request):
 
 
 def setting_email(request):
+    obj = request.user
     params = {
         'title': 'Setting Password',
-        'form': SettingEmailForm(),
+        'form': SettingEmailForm(instance=obj),
+        'error_message': '',
     }
+    if request.method == 'POST':
+        form = SettingEmailForm(request.POST, instance=obj)
+        params['form'] = form
+        if form.is_valid():
+            form.save()
+            return redirect(to='/diary/setting')
+        else:
+            params['error_message'] = '適切なメールアドレスを入力してください'
     return render(request, 'diary/setting_email.html', params)
 
 
