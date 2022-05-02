@@ -1,6 +1,6 @@
 from turtle import color
 from django.shortcuts import redirect, render
-from .models import User
+from .models import User, Diary
 from diary.forms import DiaryForm, LoginUserForm, RegisterUserForm, SettingEmailForm, SettingPasswordForm
 import matplotlib
 matplotlib.use('Agg')
@@ -84,6 +84,25 @@ def edit_diary(request, num):
         return redirect(to='/diary')
     return render(request, 'diary/edit_diary.html', params)
 
+'''
+日記削除
+'''
+def delete_diary(request, num):
+    diary =  Diary.objects.get(id=num)
+    #取得した日記のユーザーが、アクセスしているユーザーでなければリダイレクト
+    if diary.user != request.user:
+        return redirect(to='/diary')
+
+    if request.method == 'POST':
+        diary.delete()
+        return redirect(to='/diary')
+
+    params = {
+        'title': 'Delete Diary',
+        'id': num,
+        'diary': diary,
+    }
+    return render(request, 'diary/delete_diary.html', params)
 
 '''
 設定画面
