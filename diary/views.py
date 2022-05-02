@@ -1,6 +1,6 @@
 from turtle import color
 from django.shortcuts import redirect, render
-from .models import User
+from .models import User, Diary
 from diary.forms import DiaryForm, LoginUserForm, RegisterUserForm, SettingEmailForm, SettingPasswordForm
 import matplotlib
 matplotlib.use('Agg')
@@ -75,13 +75,27 @@ def create_diary(request):
 日記編集
 '''
 def edit_diary(request, num):
+    obj = Diary.objects.get(id=num)
+    #取得した日記オブジェクトのユーザーが、アクセスしているユーザーでなければリダイレクト
+    if(obj.user != request.user):
+        return redirect(to='/diary')
+    
     params = {
         'title': 'Edit Diary',
-        'form': DiaryForm(),
+        'id': num,
+        'form': DiaryForm(instance=obj),
+        'error_message': "",
     }
+    
     if (request.method == 'POST'):
         # ここで入力内容の照合
-        return redirect(to='/diary')
+        form = DiaryForm(request.POST, instance=obj)
+        params['form'] = form
+        if form.is_valid():
+            form.save()
+            return redirect(to='/diary')
+        else:
+            params['error_message'] = "コメントは500文字以内にしてください"
     return render(request, 'diary/edit_diary.html', params)
 
 
