@@ -24,7 +24,7 @@
     </header>
   </div>
   <div class="container">
-    <form action="{% url 'edit_diary' %}" method="post">
+    <form action="{% url 'edit_diary' id %}" method="post">
       {% csrf_token %}
       <table class="table">
         {{ form.as_table }}
