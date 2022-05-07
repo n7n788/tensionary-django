@@ -8,6 +8,9 @@ import matplotlib.pyplot as plt
 import base64, io
 import numpy as np
 
+#ログアウトに必要な機能をインポート
+from django.contrib.auth.views import LogoutView
+
 figsize_x = 12
 figsize_y = 4
 
@@ -127,6 +130,12 @@ def login(request):
     }
     return render(request, 'diary/login.html', params)
 
+'''
+ログアウト
+'''
+#ログアウト機能の処理
+class Logout(LogoutView):
+    template_name = 'diary/logout.html'
 
 '''
 新規登録
