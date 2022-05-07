@@ -9,5 +9,7 @@ urlpatterns = [
     path('create_diary', views.create_diary, name='create_diary'),
     path('setting', views.setting, name='setting'),
     path('setting_email', views.setting_email, name='setting_email'),
-    path('setting_password', views.setting_password, name='setting_password'),
+    path('setting_password', views.SettingPassword.as_view(), name='setting_password'),
+    # パスワード変更後の画面をurlに追加
+    path('setting_password/done', views.SettingPasswordDone.as_view(), name='setting_password_done'),
 ]
