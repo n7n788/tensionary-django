@@ -2,6 +2,8 @@ from django import forms
 
 from diary.models import Diary, User
 
+from django.contrib.auth.forms import PasswordChangeForm
+
 class LoginUserForm(forms.Form):
     email = forms.EmailField(label='メールアドレス')
     password = forms.CharField(label='パスワード', widget=forms.PasswordInput(), min_length=8)
@@ -40,7 +42,15 @@ class SettingEmailForm(forms.ModelForm):
         model = User
         fields = ['email']
 
-class SettingPasswordForm(forms.Form):
-    current_password = forms.CharField(label='現在のパスワード', widget=forms.PasswordInput(), min_length=8)
-    password = forms.CharField(label='パスワード', widget=forms.PasswordInput(), min_length=8)
-    password_again = forms.CharField(label='パスワード(確認)', widget=forms.PasswordInput(), min_length=8)
+# class SettingPasswordForm(forms.Form):
+    # current_password = forms.CharField(label='現在のパスワード', widget=forms.PasswordInput(), min_length=8)
+    # password = forms.CharField(label='パスワード', widget=forms.PasswordInput(), min_length=8)
+    # password_again = forms.CharField(label='パスワード(確認)', widget=forms.PasswordInput(), min_length=8)
+
+class SettingPasswordForm(PasswordChangeForm):
+    """パスワード変更フォーム"""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
