@@ -11,6 +11,11 @@ import numpy as np
 figsize_x = 12
 figsize_y = 4
 
+#パスワード変更に必要な機能をインポート
+from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views import generic
+
 # Create your views here.
 '''
 トップページ
@@ -104,13 +109,15 @@ def setting_email(request):
     return render(request, 'diary/setting_email.html', params)
 
 
-def setting_password(request):
-    params = {
-        'title': 'Setting Password',
-        'form': SettingPasswordForm(),
-    }
-    return render(request, 'diary/setting_password.html', params)
+class SettingPassword(LoginRequiredMixin, PasswordChangeView):
+    """パスワード変更ビュー"""
+    form_class = SettingPasswordForm
+    success_url = 'setting_password/done'
+    template_name = 'diary/setting_password.html'
 
+class SettingPasswordDone(LoginRequiredMixin,PasswordChangeDoneView):
+    """パスワード変更完了ビュー"""
+    template_name = 'diary/setting_password_done.html'
 
 '''
 ログイン
